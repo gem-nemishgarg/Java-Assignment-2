@@ -17,8 +17,8 @@ public class Project {
     private Integer projectId;
     private String name;
     private String description;
-    private String clientName;
     private Boolean isActive;
+    private String clientName;
     private Integer lastModifiedBy;
     private Timestamp lastModifiedOn;
 }

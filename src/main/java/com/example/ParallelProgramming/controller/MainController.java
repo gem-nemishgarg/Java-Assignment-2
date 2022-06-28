@@ -13,47 +13,56 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/async")
+@RequestMapping("/parallel")
 public class MainController {
 
     @Autowired
     private MainService mainService;
 
-    @GetMapping("/id")
-    public Response<Candidate> getCandidateById(@PathVariable int id) {
-        Response<Candidate> response = new Response<>();
-        Candidate candidate = mainService.getEmployeeById(id);
-        if (candidate != null) {
-            response.setData(candidate);
-            response.setSuccessMessage("Fetched candidate successfully");
-        } else {
-            response.setErrorMessage("Not found any data for given candidate Id");
-        }
-        return response;
-    }
-
+    /*
+    Get API to fetch all Candidates
+    */
     @GetMapping("/all")
     public Response<List<Candidate>> getAllCandidates() {
         Response<List<Candidate>> response = new Response<>();
-        List<Candidate> employeeList = mainService.getAllEmployee();
-        if (employeeList != null && employeeList.size() > 0) {
-            response.setData(employeeList);
-            response.setSuccessMessage("Got all active record successfully");
+        List<Candidate> candidateList = mainService.getAllCandidate();
+        if (candidateList != null && candidateList.size() > 0) {
+            response.setData(candidateList);
+            response.setSuccessMessage("Got all active records successfully.");
         } else {
-            response.setErrorMessage("Not found any active records");
+            response.setErrorMessage("Not found any active records.");
         }
         return response;
     }
 
-    @GetMapping("/emp/projects/empId")
-    public Response<CandidateProjectDetails> getAllProjectsOfEmp(@PathVariable int empId) {
-        Response<CandidateProjectDetails> response = new Response<>();
-        CandidateProjectDetails employeeProjectDetails = mainService.getAllEmployeeProjectsById(empId);
-        if (employeeProjectDetails != null) {
-            response.setData(employeeProjectDetails);
-            response.setSuccessMessage("Got all projects of " + employeeProjectDetails.getEmpName());
+    /*
+    Get API to find a particular Candidate based on ID
+    */
+    @GetMapping("/id")
+    public Response<Candidate> getCandidateById(@PathVariable int id) {
+        Response<Candidate> response = new Response<>();
+        Candidate candidate = mainService.getCandidateById(id);
+        if (candidate != null) {
+            response.setData(candidate);
+            response.setSuccessMessage("Fetched candidate successfully.");
         } else {
-            response.setErrorMessage("Not found any projects for employee id - " + empId);
+            response.setErrorMessage("Not found any data for given candidate Id.");
+        }
+        return response;
+    }
+
+    /*
+    Get API to find list of Projects mapped to a Candidate
+    */
+    @GetMapping("/cnd/projects/cndId")
+    public Response<CandidateProjectDetails> getAllProjectsOfEmp(@PathVariable int cndId) {
+        Response<CandidateProjectDetails> response = new Response<>();
+        CandidateProjectDetails candidateProjectDetails = mainService.getAllCandidateProjectsById(cndId);
+        if (candidateProjectDetails != null) {
+            response.setData(candidateProjectDetails);
+            response.setSuccessMessage("Fetched all projects of " + candidateProjectDetails.getEmpName() + ".");
+        } else {
+            response.setErrorMessage("Not found any projects for candidate id - " + cndId + ".");
         }
         return response;
     }

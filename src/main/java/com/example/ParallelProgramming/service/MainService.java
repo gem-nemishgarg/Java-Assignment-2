@@ -21,44 +21,44 @@ public class MainService {
     private static final Logger log = LoggerFactory.getLogger(MainService.class);
 
     @Autowired
-    private CandidateDAO employeeRepo;
+    private CandidateDAO candidateDAO;
 
     @Autowired
-    private ProjectDAO projectRepo;
+    private ProjectDAO projectDAO;
 
-    public Candidate getEmployeeById(Integer empId) {
-        CompletableFuture<Candidate> completableFuture = employeeRepo.getEmployeeById(empId);
-        Candidate employee = null;
+    public Candidate getCandidateById(Integer cndId) {
+        CompletableFuture<Candidate> completableFuture = candidateDAO.getCandidateById(cndId);
+        Candidate candidate = null;
         try {
-            employee = completableFuture.get();
+            candidate = completableFuture.get();
         } catch (Exception exception) {
-            log.error("Exception occurred while fetching employee details for empId - " + empId);
+            log.error("Exception occurred while fetching candidate details for cndId - " + cndId + ".");
         }
-        return employee;
+        return candidate;
     }
 
-    public List<Candidate> getAllEmployee() {
-        CompletableFuture<List<Candidate>> empListFuture = employeeRepo.getAllEmployee();
-        List<Candidate> employeeList = new ArrayList<>();
+    public List<Candidate> getAllCandidate() {
+        CompletableFuture<List<Candidate>> empListFuture = candidateDAO.getAllCandidate();
+        List<Candidate> candidateList = new ArrayList<>();
         try {
-            employeeList = empListFuture.get();
+            candidateList = empListFuture.get();
         } catch (Exception ex) {
-            log.error("Exception occurred while fetching employee list from future object");
+            log.error("Exception occurred while fetching candidate list from future object.");
         }
-        return employeeList;
+        return candidateList;
     }
 
-    public CandidateProjectDetails getAllEmployeeProjectsById(Integer empId) {
-        List<CandidateProjectMapping> empProjectMappings = employeeRepo.getAllProjectOfEmp(empId);
+    public CandidateProjectDetails getAllCandidateProjectsById(Integer cndId) {
+        List<CandidateProjectMapping> candidateProjectMappings = candidateDAO.getAllProjectOfEmp(cndId);
         List<CompletableFuture<Project>> projectList = new ArrayList<>();
-        empProjectMappings.forEach(empProjectMapping -> {
-            CompletableFuture<Project> project = projectRepo.getProjectById(empProjectMapping.getProjectId());
+        candidateProjectMappings.forEach(cndProjectMapping -> {
+            CompletableFuture<Project> project = projectDAO.getProjectById(cndProjectMapping.getProjectId());
             projectList.add(project);
         });
-        log.info("Waiting for all projects to be fetched from DB for empId -" + empId);
-        CompletableFuture.allOf(projectList.toArray(new CompletableFuture[empProjectMappings.size()])).join();
+        log.info("Waiting for all projects to be fetched from Database for cndId - " + cndId + ".");
+        CompletableFuture.allOf(projectList.toArray(new CompletableFuture[candidateProjectMappings.size()])).join();
 
-        Candidate employee = getEmployeeById(empId);
+        Candidate candidate = getCandidateById(cndId);
         List<Project> projects = new ArrayList<>();
         for (CompletableFuture<Project> projectCompletableFuture : projectList) {
             try {
@@ -66,25 +66,25 @@ public class MainService {
                 if (project != null)
                     projects.add(project);
             } catch (Exception e) {
-                log.error("Exception occurred while getting projectList from future object");
+                log.error("Exception occurred while getting projectList from future object.");
             }
         }
-        return mapEmpProjectDetails(employee, projects);
+        return mapEmpProjectDetails(candidate, projects);
     }
 
     public CandidateProjectDetails mapEmpProjectDetails(Candidate candidate, List<Project> projectList) {
-        CandidateProjectDetails employeeProjectDetails = new CandidateProjectDetails();
+        CandidateProjectDetails candidateProjectDetails = new CandidateProjectDetails();
         if (candidate != null) {
-            employeeProjectDetails.setEmpId(candidate.getEmpId());
-            employeeProjectDetails.setEmpName(candidate.getFirstName() + " " + candidate.getLastName());
-            employeeProjectDetails.setEmail(candidate.getEmail());
-            employeeProjectDetails.setPhoneNo(candidate.getPhoneNo());
-            employeeProjectDetails.setDestination(candidate.getDestination());
-            employeeProjectDetails.setLocation(candidate.getLocation());
+            candidateProjectDetails.setEmpId(candidate.getEmpId());
+            candidateProjectDetails.setEmpName(candidate.getFirstName() + " " + candidate.getLastName());
+            candidateProjectDetails.setPhoneNo(candidate.getPhoneNo());
+            candidateProjectDetails.setEmail(candidate.getEmail());
+            candidateProjectDetails.setDestination(candidate.getDestination());
+            candidateProjectDetails.setLocation(candidate.getLocation());
         }
         if (projectList != null) {
-            employeeProjectDetails.setProjects(projectList);
+            candidateProjectDetails.setProjects(projectList);
         }
-        return employeeProjectDetails;
+        return candidateProjectDetails;
     }
 }

@@ -31,43 +31,43 @@ public class CandidateDAO {
     public static final String GET_ALL_PROJECTS_BY_EMPID = "SELECT * FROM EmpProjectMapping Where empId=:empId";
 
     @Async
-    public CompletableFuture<Candidate> getEmployeeById(Integer empId) {
+    public CompletableFuture<Candidate> getCandidateById(Integer cndId) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValue("empId", empId);
-        Candidate employee;
+        parameterSource.addValue("empId", cndId);
+        Candidate candidate;
         try {
-            employee = jdbcTemplate.queryForObject(GET_EMPLOYEE_DETAIL_BY_ID,
+            candidate = jdbcTemplate.queryForObject(GET_EMPLOYEE_DETAIL_BY_ID,
                     parameterSource, BeanPropertyRowMapper.newInstance(Candidate.class));
         } catch (EmptyResultDataAccessException e) {
-            throw new CustomException("No record exist for employee id - " + empId, HttpStatus.NOT_FOUND);
+            throw new CustomException("No record exist for candidate id - " + cndId, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return CompletableFuture.completedFuture(employee);
+        return CompletableFuture.completedFuture(candidate);
     }
 
     @Async
-    public CompletableFuture<List<Candidate>> getAllEmployee() {
-        List<Candidate> employeeList = new ArrayList<>();
+    public CompletableFuture<List<Candidate>> getAllCandidate() {
+        List<Candidate> candidateList = new ArrayList<>();
         try {
-            employeeList = jdbcTemplate.query(GET_ALL_EMPLOYEE,
+            candidateList = jdbcTemplate.query(GET_ALL_EMPLOYEE,
                     new MapSqlParameterSource(), BeanPropertyRowMapper.newInstance(Candidate.class));
         } catch (Exception e) {
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return CompletableFuture.completedFuture(employeeList);
+        return CompletableFuture.completedFuture(candidateList);
     }
 
-    public List<CandidateProjectMapping> getAllProjectOfEmp(Integer empId) {
+    public List<CandidateProjectMapping> getAllProjectOfEmp(Integer cndId) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValue("empId", empId);
-        List<CandidateProjectMapping> empProjects = new ArrayList<>();
+        parameterSource.addValue("empId", cndId);
+        List<CandidateProjectMapping> cndProjects = new ArrayList<>();
         try {
-            empProjects = jdbcTemplate.query(GET_ALL_PROJECTS_BY_EMPID,
+            cndProjects = jdbcTemplate.query(GET_ALL_PROJECTS_BY_EMPID,
                     parameterSource, BeanPropertyRowMapper.newInstance(CandidateProjectMapping.class));
         } catch (Exception e) {
             throw new CustomException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return empProjects;
+        return cndProjects;
     }
 }
